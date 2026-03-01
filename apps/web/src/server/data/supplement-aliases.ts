@@ -79,6 +79,13 @@ export const supplementAliases: Record<string, string[]> = {
   Boron: ["boron glycinate"],
   Iodine: ["iodide", "potassium iodide", "ki"],
   Chromium: ["chromium picolinate", "cr"],
+  Molybdenum: [
+    "molybdenum",
+    "molybdate",
+    "moly",
+    "mo",
+    "sodium molybdate",
+  ],
 
   // ============================================
   // OMEGA-3

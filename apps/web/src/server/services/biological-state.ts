@@ -1531,6 +1531,7 @@ export async function getSafetyHeadroom(
     "zinc",
     "iron",
     "copper",
+    "molybdenum",
     "calcium",
     "vitamin-d3",
     "vitamin-c",

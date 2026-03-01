@@ -89,6 +89,7 @@ type SafetyCategoryKey =
   | "zinc"
   | "iron"
   | "copper"
+  | "molybdenum"
   | "calcium"
   | "selenium"
   | "vitamin-d3"
@@ -706,6 +707,30 @@ const supplements = [
     halfLifeMinutes: 2400, // ~40h
     absorptionWindowMinutes: 120,
     bioavailabilityPercent: 2.5, // Very low
+  },
+  {
+    name: "Molybdenum",
+    form: "Sodium Molybdate",
+    elementalWeight: 39.7,
+    defaultUnit: "mcg" as const,
+    aliases: ["molybdenum", "molybdate", "moly", "mo", "sodium molybdate"],
+    description:
+      "Essential trace mineral cofactor for sulfite, xanthine, and aldehyde oxidase enzymes",
+    mechanism:
+      "Supports molybdoenzyme activity in sulfur amino acid metabolism and purine catabolism",
+    researchUrl: "https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/",
+    category: "mineral" as SupplementCategory,
+    commonGoals: ["health"],
+    safetyCategory: "molybdenum" as SafetyCategoryKey,
+    suggestionProfile: DEFICIENCY_ONLY_PROFILE(
+      [],
+      "Molybdenum deficiency is uncommon in mixed diets. Avoid high chronic doses unless clinically indicated and monitor copper status.",
+    ),
+    // PK: Well-absorbed trace mineral, moderate retention
+    peakMinutes: 120,
+    halfLifeMinutes: 1080, // ~18h
+    absorptionWindowMinutes: 180,
+    bioavailabilityPercent: 90,
   },
 
   // ============================================
@@ -1887,6 +1912,18 @@ async function seed() {
       suggestion:
         "Take zinc and copper at separate meals (2+ hours apart), or ensure 10:1 zinc:copper ratio",
     },
+    {
+      sourceId: supplementMap.get("Molybdenum")!,
+      targetId: supplementMap.get("Copper Bisglycinate")!,
+      type: "competition" as const,
+      mechanism:
+        "Excess molybdenum can increase urinary copper losses and contribute to secondary copper deficiency",
+      severity: "medium" as const,
+      researchUrl:
+        "https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/",
+      suggestion:
+        "Avoid high-dose long-term molybdenum with copper unless supervised; separate by 2+ hours and monitor copper status.",
+    },
 
     // ============================================
     // IRON COMPETITION (Medium)
@@ -2550,6 +2587,16 @@ async function seed() {
         "Zinc induces intestinal metallothionein synthesis, which preferentially sequesters copper ions; chronic Zn >40mg/day without Cu supplementation causes hypocupremia within 8-12 weeks",
       severity: "critical" as const,
       researchUrl: "https://pubmed.ncbi.nlm.nih.gov/2407097/",
+    },
+    {
+      sourceSupplementId: supplementMap.get("Molybdenum")!,
+      targetSupplementId: supplementMap.get("Copper Bisglycinate")!,
+      minHoursApart: 2,
+      reason:
+        "High molybdenum intake can antagonize copper status over time; spacing reduces direct co-administration while preserving copper intake timing consistency.",
+      severity: "low" as const,
+      researchUrl:
+        "https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/",
     },
   ];
 

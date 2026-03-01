@@ -14,6 +14,7 @@ export type SafetyCategory =
   | "zinc"
   | "iron"
   | "copper"
+  | "molybdenum"
   | "calcium"
   | "selenium"
   | "vitamin-d3"
@@ -44,7 +45,7 @@ export type SafetyLimit = {
  * Upper limits keyed by safety category.
  * These categories map to the `safetyCategory` column in the supplement table.
  *
- * Hard limits (BLOCK): zinc, iron, copper, vitamin-a, vitamin-b6, vitamin-d3, selenium
+ * Hard limits (BLOCK): zinc, iron, copper, molybdenum, vitamin-a, vitamin-b6, vitamin-d3, selenium
  * Soft limits (WARNING): magnesium, vitamin-c, calcium, vitamin-e
  */
 export const SAFETY_LIMITS: Record<SafetyCategory, SafetyLimit> = {
@@ -73,6 +74,14 @@ export const SAFETY_LIMITS: Record<SafetyCategory, SafetyLimit> = {
     source: "NIH",
     isHardLimit: true,
     notes: "Elemental copper UL; liver toxicity at high doses",
+  },
+  molybdenum: {
+    limit: 2000,
+    unit: "mcg",
+    source: "NIH",
+    isHardLimit: true,
+    notes:
+      "Elemental molybdenum UL; chronic high intake can increase uric acid and induce secondary copper deficiency",
   },
   "vitamin-a": {
     limit: 10000,
@@ -203,6 +212,7 @@ export function formatSafetyLimitsForPrompt(): string {
     "vitamin-d3",
     "zinc",
     "copper",
+    "molybdenum",
     "iron",
     "calcium",
     "magnesium",
