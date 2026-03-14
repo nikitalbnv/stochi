@@ -31,4 +31,22 @@ describe("demo dashboard calm contract", () => {
     assert.equal(source.includes("section id=\"demo-protocols\" className=\"space-y-2\""), true);
     assert.equal(source.includes("space-y-5"), false);
   });
+
+  it("sets employer expectations for what demo mode does and does not persist", () => {
+    const dashboard = readFileSync("src/app/demo/demo-dashboard-client.tsx", "utf8");
+    const banner = readFileSync("src/components/demo/demo-banner.tsx", "utf8");
+
+    assert.equal(
+      banner.includes("Interactive sample workspace with resettable seeded data."),
+      true,
+    );
+    assert.equal(
+      banner.includes("Create an account to save real protocols, logs, and settings."),
+      true,
+    );
+    assert.equal(
+      dashboard.includes("Everything here is interactive, but demo data resets and never touches a real account."),
+      true,
+    );
+  });
 });

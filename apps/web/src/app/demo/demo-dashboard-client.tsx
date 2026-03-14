@@ -229,6 +229,9 @@ function DemoShowcasePanel() {
             Log one entry, run one protocol, then watch timeline and safety
             signals update.
           </p>
+          <p className="text-muted-foreground/80 mt-2 max-w-xl text-sm leading-6">
+            Everything here is interactive, but demo data resets and never touches a real account.
+          </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button asChild size="sm" className="rounded-md">
               <a href="#demo-command-bar">Start in Command Bar</a>

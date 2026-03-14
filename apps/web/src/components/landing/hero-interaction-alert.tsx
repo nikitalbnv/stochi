@@ -145,18 +145,12 @@ export function HeroInteractionAlert() {
             />
           </div>
 
-          {/* Footer stats bar */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-white/10 pt-4 text-xs text-white/30">
-            <span>
-              <span className="font-mono text-emerald-400">89,412</span> pairs
-            </span>
+            <span>Demo trace based on seeded interaction rules</span>
             <span className="text-white/10">•</span>
-            <span>
-              <span className="font-mono text-emerald-400">1,423</span>{" "}
-              compounds
-            </span>
+            <span>Grounded in citation-linked warning cards</span>
             <span className="hidden text-white/10 sm:inline">•</span>
-            <span className="hidden font-mono sm:inline">47ms</span>
+            <span className="hidden sm:inline">Built to mirror the live demo flow</span>
           </div>
         </div>
       </div>

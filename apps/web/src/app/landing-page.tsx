@@ -238,7 +238,7 @@ export function LandingPage() {
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
                   <span className="text-white/95">
-                    Paste your stack. Spot overlaps, conflicts, and clutter.
+                    See your supplement protocol react before you trust it.
                   </span>
                 </motion.h1>
 
@@ -253,8 +253,7 @@ export function LandingPage() {
                     delay: 0.2,
                   }}
                 >
-                  Add your supplements and get a clear audit of ingredient
-                  overlap, potential interaction flags, and timing issues.
+                  Turn supplement chaos into a protocol you can actually defend. Run one interactive demo to see timing, overlap, and safety signals update in real time.
                 </motion.p>
 
                 {/* Primary CTA - Attio-style clean button */}
@@ -274,7 +273,7 @@ export function LandingPage() {
                       size="lg"
                       className="rounded-md bg-foreground px-8 text-sm font-medium text-background shadow-lg shadow-black/25 transition-all duration-300 hover:bg-foreground/90 hover:shadow-xl hover:shadow-black/30"
                     >
-                      <Link href="/auth/sign-up">Run My Stack Audit</Link>
+                      <Link href="/demo">Try the Interactive Demo</Link>
                     </Button>
                     <Button
                       asChild
@@ -282,13 +281,28 @@ export function LandingPage() {
                       variant="outline"
                       className="rounded-md border-white/20 px-6 text-sm font-medium text-white/80 transition-all duration-300 hover:border-white/40 hover:bg-white/5 hover:text-white"
                     >
-                      <Link href="#case-study-heading">See Example Audit</Link>
+                      <Link href="/auth/sign-up">Create Your Account</Link>
                     </Button>
                   </div>
                   <span className="text-xs tracking-wide text-white/30">
-                    Built for people who take their supplement stack seriously.
+                    Employers can validate the product in under two minutes.
                   </span>
                 </motion.div>
+                <motion.p
+                  className="mt-4 max-w-xl text-sm leading-6 text-white/45"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                    delay: 0.5,
+                  }}
+                >
+                  What employers can verify in 2 minutes: command-bar logging,
+                  one-tap protocol execution, timeline changes, and
+                  citation-linked safety output. Demo data is interactive but
+                  resettable.
+                </motion.p>
               </div>
 
               {/* Right: Hero Visual (5 columns = ~42%) */}
@@ -329,7 +343,7 @@ export function LandingPage() {
           >
             <div className="mx-auto max-w-5xl px-4">
               <p className="mb-8 text-center text-sm font-medium tracking-wide text-white/50 md:mb-12">
-                Built for people who take their supplement stack seriously.
+                Review the live demo, then inspect the architecture.
               </p>
               <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
                 {/* NIH */}
@@ -1228,27 +1242,26 @@ export function LandingPage() {
                 </p>
               </div>
 
-              {/* Stats */}
               <div className="flex items-center gap-6 text-xs text-white/40">
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1 text-center">
                   <span className="font-mono text-lg font-semibold text-white/70">
-                    1,423
+                    LIVE
                   </span>
-                  <span>Compounds</span>
+                  <span>demo flow</span>
                 </div>
                 <div className="h-8 w-px bg-white/10" />
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1 text-center">
                   <span className="font-mono text-lg font-semibold text-white/70">
-                    89,412
+                    GO + TS
                   </span>
-                  <span>Interactions</span>
+                  <span>analysis paths</span>
                 </div>
                 <div className="h-8 w-px bg-white/10" />
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1 text-center">
                   <span className="font-mono text-lg font-semibold text-white/70">
-                    2025
+                    TESTED
                   </span>
-                  <span>Database</span>
+                  <span>core logic</span>
                 </div>
               </div>
 
@@ -1511,9 +1524,9 @@ function ProtocolDemo() {
         )}
       </div>
 
-      {/* Performance claim */}
       <p className="mt-3 text-center text-xs text-white/40">
-        Execute 15+ supplements in 300ms
+        Demo sequence showing one-tap protocol execution and visible system
+        feedback
       </p>
     </div>
   );

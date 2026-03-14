@@ -3,15 +3,21 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 describe("landing page editorial contract", () => {
-  it("uses stack-audit wedge copy and section hierarchy", () => {
+  it("uses employer-focused protocol intelligence copy and section hierarchy", () => {
     const page = readFileSync("src/app/landing-page.tsx", "utf8");
 
     assert.equal(page.includes("bg-background"), true);
     assert.equal(page.includes("text-foreground"), true);
     assert.equal(
-      page.includes("Paste your stack. Spot overlaps, conflicts, and clutter."),
+      page.includes("See your supplement protocol react before you trust it."),
       true,
     );
+    assert.equal(
+      page.includes("Turn supplement chaos into a protocol you can actually defend."),
+      true,
+    );
+    assert.equal(page.includes("Try the Interactive Demo"), true);
+    assert.equal(page.includes("href=\"/demo\""), true);
     assert.equal(page.includes("Your stack grew. Your confidence dropped."), true);
     assert.equal(page.includes("How it works"), true);
     assert.equal(page.includes("What you get from the audit"), true);
@@ -27,5 +33,20 @@ describe("landing page editorial contract", () => {
       ),
       true,
     );
+  });
+
+  it("avoids invented-looking hardcoded proof metrics in the landing surface", () => {
+    const page = readFileSync("src/app/landing-page.tsx", "utf8");
+    const hero = readFileSync(
+      "src/components/landing/hero-interaction-alert.tsx",
+      "utf8",
+    );
+
+    assert.equal(hero.includes("89,412"), false);
+    assert.equal(hero.includes("1,423"), false);
+    assert.equal(hero.includes("47ms"), false);
+    assert.equal(page.includes("Execute 15+ supplements in 300ms"), false);
+    assert.equal(page.includes("What employers can verify in 2 minutes"), true);
+    assert.equal(hero.includes("Demo trace based on seeded interaction rules"), true);
   });
 });
