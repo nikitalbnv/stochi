@@ -19,6 +19,12 @@ import { getTemplateByKey } from "~/server/data/stack-templates";
 import { type GoalKey, goals } from "~/server/data/goal-recommendations";
 import { getUserTimezone } from "~/server/actions/preferences";
 import { getStartOfDayInTimezone } from "~/lib/utils";
+import {
+  buildGoalInserts,
+  buildOnboardingProtocolItems,
+  buildOnboardingStackItems,
+  buildTemplateStackPayloads,
+} from "./onboarding-payloads";
 
 /**
  * Instantiate a template stack for the user.
@@ -56,42 +62,39 @@ export async function instantiateTemplate(
     };
   }
 
-  // Create stack
-  const [newStack] = await db
-    .insert(stack)
-    .values({
+  const today = new Date();
+  today.setHours(8, 0, 0, 0);
+
+  const newStack = await db.transaction(async (tx) => {
+    const [createdStack] = await tx
+      .insert(stack)
+      .values({
+        userId: session.user.id,
+        name: template.name,
+      })
+      .returning();
+
+    if (!createdStack) {
+      throw new Error("Failed to create stack");
+    }
+
+    const payloads = buildTemplateStackPayloads({
+      stackId: createdStack.id,
       userId: session.user.id,
-      name: template.name,
-    })
-    .returning();
+      templateSupplements: template.supplements,
+      supplementMap,
+      loggedAt: today,
+    });
+
+    await tx.insert(stackItem).values(payloads.stackItems);
+    await tx.insert(log).values(payloads.logs);
+
+    return createdStack;
+  });
 
   if (!newStack) {
     return { success: false, error: "Failed to create stack" };
   }
-
-  // Create stack items
-  const stackItems = template.supplements.map((s) => ({
-    stackId: newStack.id,
-    supplementId: supplementMap.get(s.supplementName)!,
-    dosage: s.dosage,
-    unit: s.unit,
-  }));
-
-  await db.insert(stackItem).values(stackItems);
-
-  // Create today's logs (8:00 AM)
-  const today = new Date();
-  today.setHours(8, 0, 0, 0);
-
-  const logs = template.supplements.map((s) => ({
-    userId: session.user.id,
-    supplementId: supplementMap.get(s.supplementName)!,
-    dosage: s.dosage,
-    unit: s.unit,
-    loggedAt: today,
-  }));
-
-  await db.insert(log).values(logs);
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/stacks");
@@ -198,21 +201,21 @@ export async function clearTemplateData(
   // Get supplement IDs from the stack
   const supplementIds = userStack.items.map((item) => item.supplementId);
 
-  // Delete today's logs for these supplements
-  if (supplementIds.length > 0) {
-    await db
-      .delete(log)
-      .where(
-        and(
-          eq(log.userId, session.user.id),
-          inArray(log.supplementId, supplementIds),
-          gte(log.loggedAt, todayStart),
-        ),
-      );
-  }
+  await db.transaction(async (tx) => {
+    if (supplementIds.length > 0) {
+      await tx
+        .delete(log)
+        .where(
+          and(
+            eq(log.userId, session.user.id),
+            inArray(log.supplementId, supplementIds),
+            gte(log.loggedAt, todayStart),
+          ),
+        );
+    }
 
-  // Delete the stack (cascade deletes stack items)
-  await db.delete(stack).where(eq(stack.id, stackId));
+    await tx.delete(stack).where(eq(stack.id, stackId));
+  });
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/stacks");
@@ -308,111 +311,102 @@ export async function createStackFromOnboarding(data: {
     }
   }
 
-  // Create stack (for backward compatibility)
-  const [newStack] = await db
-    .insert(stack)
-    .values({
-      userId: session.user.id,
-      name: data.stackName.trim(),
-    })
-    .returning();
+  const stackName = data.stackName.trim();
+  const now = new Date();
 
-  if (!newStack) {
-    return { success: false, error: "Failed to create stack" };
-  }
-
-  // Create stack items
-  const stackItems = data.supplements.map((s) => ({
-    stackId: newStack.id,
-    supplementId: s.supplementId,
-    dosage: s.dosage,
-    unit: s.unit,
-  }));
-
-  await db.insert(stackItem).values(stackItems);
-
-  // Create or get user's protocol
-  let userProtocol = await db.query.protocol.findFirst({
-    where: eq(protocol.userId, session.user.id),
-    columns: { id: true },
-  });
-
-  if (!userProtocol) {
-    const [newProtocol] = await db
-      .insert(protocol)
+  const newStack = await db.transaction(async (tx) => {
+    const [createdStack] = await tx
+      .insert(stack)
       .values({
         userId: session.user.id,
-        name: "My Protocol",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        name: stackName,
       })
       .returning();
 
-    if (newProtocol) {
-      userProtocol = { id: newProtocol.id };
+    if (!createdStack) {
+      throw new Error("Failed to create stack");
     }
-  }
 
-  // Add supplements to protocol using onboarding timing slots
-  if (userProtocol) {
-    const protocolItems = data.supplements.map((s, index) => ({
-      protocolId: userProtocol.id,
-      supplementId: s.supplementId,
-      dosage: s.dosage,
-      unit: s.unit,
-      timeSlot: s.timeSlot ?? "morning",
-      frequency: "daily" as const,
-      groupName: data.stackName.trim(),
-      sortOrder: index,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }));
-
-    await db.insert(protocolItem).values(protocolItems);
-
-    // Update protocol timestamp
-    await db
-      .update(protocol)
-      .set({ updatedAt: new Date() })
-      .where(eq(protocol.id, userProtocol.id));
-  }
-
-  // Save goals if provided (with priority based on selection order)
-  if (data.goals && data.goals.length > 0) {
-    // Delete any existing goals first (shouldn't have any for new users, but just in case)
-    await db.delete(userGoal).where(eq(userGoal.userId, session.user.id));
-
-    // Insert all selected goals with priority based on order
-    const goalInserts = data.goals.map((goal, index) => ({
-      userId: session.user.id,
-      goal,
-      priority: index + 1,
-      createdAt: new Date(),
-    }));
-
-    await db.insert(userGoal).values(goalInserts);
-  }
-
-  // Save experience level if provided
-  if (data.experienceLevel) {
-    const existing = await db.query.userPreference.findFirst({
-      where: eq(userPreference.userId, session.user.id),
+    const stackItems = buildOnboardingStackItems({
+      stackId: createdStack.id,
+      supplements: data.supplements,
     });
 
-    if (existing) {
-      await db
-        .update(userPreference)
-        .set({
-          experienceLevel: data.experienceLevel,
-          updatedAt: new Date(),
+    await tx.insert(stackItem).values(stackItems);
+
+    let userProtocolRecord = await tx.query.protocol.findFirst({
+      where: eq(protocol.userId, session.user.id),
+      columns: { id: true },
+    });
+
+    if (!userProtocolRecord) {
+      const [newProtocol] = await tx
+        .insert(protocol)
+        .values({
+          userId: session.user.id,
+          name: "My Protocol",
+          createdAt: now,
+          updatedAt: now,
         })
-        .where(eq(userPreference.userId, session.user.id));
-    } else {
-      await db.insert(userPreference).values({
-        userId: session.user.id,
-        experienceLevel: data.experienceLevel,
-      });
+        .returning();
+
+      if (newProtocol) {
+        userProtocolRecord = { id: newProtocol.id };
+      }
     }
+
+    if (userProtocolRecord) {
+      const protocolItems = buildOnboardingProtocolItems({
+        protocolId: userProtocolRecord.id,
+        stackName,
+        supplements: data.supplements,
+        now,
+      });
+
+      await tx.insert(protocolItem).values(protocolItems);
+      await tx
+        .update(protocol)
+        .set({ updatedAt: now })
+        .where(eq(protocol.id, userProtocolRecord.id));
+    }
+
+    if (data.goals && data.goals.length > 0) {
+      await tx.delete(userGoal).where(eq(userGoal.userId, session.user.id));
+      await tx.insert(userGoal).values(
+        buildGoalInserts({
+          userId: session.user.id,
+          goals: data.goals,
+          now,
+        }),
+      );
+    }
+
+    if (data.experienceLevel) {
+      const existing = await tx.query.userPreference.findFirst({
+        where: eq(userPreference.userId, session.user.id),
+      });
+
+      if (existing) {
+        await tx
+          .update(userPreference)
+          .set({
+            experienceLevel: data.experienceLevel,
+            updatedAt: now,
+          })
+          .where(eq(userPreference.userId, session.user.id));
+      } else {
+        await tx.insert(userPreference).values({
+          userId: session.user.id,
+          experienceLevel: data.experienceLevel,
+        });
+      }
+    }
+
+    return createdStack;
+  });
+
+  if (!newStack) {
+    return { success: false, error: "Failed to create stack" };
   }
 
   revalidatePath("/dashboard");
@@ -458,28 +452,35 @@ export async function createStackFromTemplate(
     };
   }
 
-  // Create stack
-  const [newStack] = await db
-    .insert(stack)
-    .values({
+  const newStack = await db.transaction(async (tx) => {
+    const [createdStack] = await tx
+      .insert(stack)
+      .values({
+        userId: session.user.id,
+        name: template.name,
+      })
+      .returning();
+
+    if (!createdStack) {
+      throw new Error("Failed to create stack");
+    }
+
+    const payloads = buildTemplateStackPayloads({
+      stackId: createdStack.id,
       userId: session.user.id,
-      name: template.name,
-    })
-    .returning();
+      templateSupplements: template.supplements,
+      supplementMap,
+      loggedAt: new Date(),
+    });
+
+    await tx.insert(stackItem).values(payloads.stackItems);
+
+    return createdStack;
+  });
 
   if (!newStack) {
     return { success: false, error: "Failed to create stack" };
   }
-
-  // Create stack items
-  const stackItems = template.supplements.map((s) => ({
-    stackId: newStack.id,
-    supplementId: supplementMap.get(s.supplementName)!,
-    dosage: s.dosage,
-    unit: s.unit,
-  }));
-
-  await db.insert(stackItem).values(stackItems);
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/stacks");
