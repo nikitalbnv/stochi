@@ -166,7 +166,7 @@ export function LandingPage() {
         {/* Skip to main content link for keyboard users */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded focus:bg-emerald-500 focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded focus:bg-foreground focus:px-4 focus:py-2 focus:text-background focus:outline-none"
         >
           Skip to main content
         </a>
@@ -210,7 +210,7 @@ export function LandingPage() {
               <Button
                 asChild
                 size="sm"
-                className="rounded-md bg-gradient-to-r from-emerald-500 to-cyan-500 text-xs font-medium text-white transition-all hover:brightness-110"
+                className="rounded-md bg-foreground text-xs font-medium text-background transition-colors hover:bg-foreground/90"
               >
                 <Link href="/auth/sign-up">Get Started</Link>
               </Button>
@@ -238,11 +238,7 @@ export function LandingPage() {
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
                   <span className="text-white/95">
-                    Stop Blinding Your Biology.
-                  </span>
-                  <br />
-                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                    Master 89,000+ Supplement Interactions.
+                    Paste your stack. Spot overlaps, conflicts, and clutter.
                   </span>
                 </motion.h1>
 
@@ -257,11 +253,8 @@ export function LandingPage() {
                     delay: 0.2,
                   }}
                 >
-                  Generic apps miss nutrient blocking and toxicity. Stochi
-                  analyzes your stack against PubMed-backed data to optimize
-                  ratios like{" "}
-                  <span className="font-mono text-white/80">Zn:Cu</span> and
-                  prevent serotonergic risks in real-time.
+                  Add your supplements and get a clear audit of ingredient
+                  overlap, potential interaction flags, and timing issues.
                 </motion.p>
 
                 {/* Primary CTA - Attio-style clean button */}
@@ -279,9 +272,9 @@ export function LandingPage() {
                     <Button
                       asChild
                       size="lg"
-                      className="rounded-md bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 text-sm font-medium text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/30 hover:brightness-110"
+                      className="rounded-md bg-foreground px-8 text-sm font-medium text-background shadow-lg shadow-black/25 transition-all duration-300 hover:bg-foreground/90 hover:shadow-xl hover:shadow-black/30"
                     >
-                      <Link href="/auth/sign-up">Run Your Stack Audit</Link>
+                      <Link href="/auth/sign-up">Run My Stack Audit</Link>
                     </Button>
                     <Button
                       asChild
@@ -289,11 +282,11 @@ export function LandingPage() {
                       variant="outline"
                       className="rounded-md border-white/20 px-6 text-sm font-medium text-white/80 transition-all duration-300 hover:border-white/40 hover:bg-white/5 hover:text-white"
                     >
-                      <Link href="/demo">Try Demo</Link>
+                      <Link href="#case-study-heading">See Example Audit</Link>
                     </Button>
                   </div>
                   <span className="text-xs tracking-wide text-white/30">
-                    Free forever • No credit card required
+                    Built for people who take their supplement stack seriously.
                   </span>
                 </motion.div>
               </div>
@@ -336,7 +329,7 @@ export function LandingPage() {
           >
             <div className="mx-auto max-w-5xl px-4">
               <p className="mb-8 text-center text-sm font-medium tracking-wide text-white/50 md:mb-12">
-                Powered by peer-reviewed research from
+                Built for people who take their supplement stack seriously.
               </p>
               <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
                 {/* NIH */}
@@ -719,10 +712,10 @@ export function LandingPage() {
               id="analyzer-heading"
               className="mb-4 text-center text-xl font-semibold text-white/90 sm:text-2xl md:text-3xl"
             >
-              Try the analyzer.
+              How it works
             </h2>
             <p className="mx-auto mb-8 text-center text-sm text-white/50 sm:text-base">
-              See how Stochi detects interactions instantly. No signup required.
+              1. Paste your stack 2. Review your audit 3. Clean up your routine.
             </p>
 
             <TerminalAnalyzer interactionDb={INTERACTION_DATABASE} autoDemo />
@@ -744,15 +737,16 @@ export function LandingPage() {
                 className="mb-4 text-2xl font-semibold text-white/90 sm:text-3xl"
                 variants={fadeInUp}
               >
-                Beyond vitamins.
+                What you get from the audit
               </motion.h2>
               <motion.p
                 className="mb-8 max-w-2xl text-base leading-relaxed text-white/50"
                 variants={fadeInUp}
               >
-                First-class support for compounds others ignore. Track research
-                chemicals, peptides, and nootropics with specific routes of
-                administration and experimental safety protocols.
+                A direct view of redundant ingredients across products, potential
+                interaction flags worth reviewing, clear timing fixes for a
+                cleaner daily routine, and a simpler stack that is easier to
+                follow and reassess.
               </motion.p>
 
               {/* Compound Ticker */}
@@ -768,7 +762,7 @@ export function LandingPage() {
               {/* Capability Comparison Table */}
               <motion.div className="mt-12" variants={fadeInUp}>
                 <h3 className="mb-4 text-sm font-semibold text-white/90">
-                  Why Stochi vs. alternatives
+                  Why this instead of spreadsheets, notes, or Reddit
                 </h3>
                 <CapabilityTable />
               </motion.div>
@@ -793,30 +787,33 @@ export function LandingPage() {
                     id="protocol-heading"
                     className="mb-4 text-2xl font-semibold text-white/90 sm:text-3xl"
                   >
-                    Execute. Don&apos;t log.
+                    Why this instead of spreadsheets, notes, or Reddit
                   </h2>
                   <p className="mb-6 text-base leading-relaxed text-white/50">
-                    Batch your intake into Protocols. Log your entire morning
-                    stack in 300ms. Frictionless compliance.
+                    Spreadsheets track entries, not ingredient logic. Notes
+                    capture ideas, not conflicts across products. Reddit gives
+                    opinions, not a structured audit of your exact stack. This
+                    tool is built for one job: auditing your stack so you can
+                    fix what is off.
                   </p>
                   <ul className="space-y-3 text-base text-white/60" role="list">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400" aria-hidden="true">
                         +
                       </span>
-                      One-tap logging for entire stacks
+                      A direct view of redundant ingredients across products
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400" aria-hidden="true">
                         +
                       </span>
-                      Progress tracking with visual indicators
+                      Potential interaction flags worth reviewing
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400" aria-hidden="true">
                         +
                       </span>
-                      Morning, evening, and custom protocols
+                      Clear timing fixes for a cleaner daily routine
                     </li>
                   </ul>
                 </motion.div>
@@ -845,15 +842,16 @@ export function LandingPage() {
                 className="mb-4 text-2xl font-semibold text-white/95 sm:text-3xl"
                 variants={fadeInUp}
               >
-                Manual tracking failed you.
+                Your stack grew. Your confidence dropped.
               </motion.h2>
               <motion.p
                 className="mb-12 max-w-2xl text-base leading-relaxed text-white/50"
                 variants={fadeInUp}
               >
-                You tracked the dosage. You missed the pharmacokinetics. Your
-                spreadsheet doesn&apos;t know that Magnesium competes with Zinc
-                for the same transporter. We do.
+                Most routines start simple, then grow into overlapping formulas,
+                extra add-ons, and inconsistent timing. At some point, you are
+                still taking everything, but you are no longer sure the stack
+                makes sense.
               </motion.p>
 
               <motion.div
@@ -867,40 +865,40 @@ export function LandingPage() {
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <span className="text-[10px] font-medium tracking-widest text-white/40 uppercase">
-                      What You Tracked
+                        Stack Input
                     </span>
                     <span className="text-[10px] font-medium text-white/30">
-                      INCOMPLETE
+                        PASTED
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between border-b border-white/10 pb-2">
-                      <span className="text-white/80">Zinc Picolinate</span>
+                      <span className="text-white/80">Multivitamin</span>
                       <span className="font-mono text-white/50 tabular-nums">
-                        50mg
+                        AM
                       </span>
                     </div>
                     <div className="flex justify-between border-b border-white/10 pb-2">
-                      <span className="text-white/80">Magnesium Glycinate</span>
+                      <span className="text-white/80">Magnesium</span>
                       <span className="font-mono text-white/50 tabular-nums">
-                        400mg
+                        AM + PM
                       </span>
                     </div>
                     <div className="flex justify-between border-b border-white/10 pb-2">
-                      <span className="text-white/80">Vitamin D3</span>
+                      <span className="text-white/80">Ashwagandha</span>
                       <span className="font-mono text-white/50 tabular-nums">
-                        5000IU
+                        AM
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-white/80">Iron</span>
+                      <span className="text-white/80">Sleep blend</span>
                       <span className="font-mono text-white/50 tabular-nums">
-                        18mg
+                        PM
                       </span>
                     </div>
                   </div>
                   <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-3 text-center text-xs text-white/40">
-                    No interaction data. No ratio analysis.
+                    AM: multivitamin, fish oil, magnesium, ashwagandha, extra zinc. PM: sleep blend + magnesium. Pre-workout 3x/week.
                   </div>
                 </motion.div>
 
@@ -913,10 +911,10 @@ export function LandingPage() {
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <span className="text-[10px] font-medium tracking-widest text-red-400 uppercase">
-                      What You Missed
+                      Output highlights
                     </span>
                     <span className="text-[10px] font-medium text-red-400">
-                      3 ERRORS
+                      AUDIT RESULTS
                     </span>
                   </div>
                   <div className="space-y-3 text-sm">
@@ -926,10 +924,10 @@ export function LandingPage() {
                       </span>
                       <div>
                         <span className="text-white/80">
-                          Zn:Cu ratio <span className="font-mono">50:1</span>
+                          Magnesium appears in 2 products
                         </span>
                         <p className="mt-0.5 text-white/50">
-                          No copper to balance zinc intake
+                          Redundant ingredient overlap detected
                         </p>
                       </div>
                     </div>
@@ -942,10 +940,10 @@ export function LandingPage() {
                       </span>
                       <div>
                         <span className="text-white/80">
-                          Mg + Zn competition
+                          Zinc is duplicated across 2 products
                         </span>
                         <p className="mt-0.5 text-white/50">
-                          Same transporter, reduced absorption
+                          Potential interaction flags to review: 2
                         </p>
                       </div>
                     </div>
@@ -957,9 +955,9 @@ export function LandingPage() {
                         !
                       </span>
                       <div>
-                        <span className="text-white/80">D3 timing unknown</span>
+                          <span className="text-white/80">Sedating ingredients split across daytime and nighttime use</span>
                         <p className="mt-0.5 text-white/50">
-                          Fat-soluble, requires meal context
+                          Suggested changes: remove 1 duplicate, move 2 items to evening, simplify routine from 7 items to 5 core items
                         </p>
                       </div>
                     </div>
@@ -985,15 +983,13 @@ export function LandingPage() {
                 className="mb-4 text-2xl font-bold text-white/90 sm:text-3xl"
                 variants={fadeInUp}
               >
-                Your Spreadsheet is Missing These Lethal Errors.
+                Example audit
               </motion.h2>
               <motion.p
                 className="mb-12 max-w-2xl text-base text-white/50"
                 variants={fadeInUp}
               >
-                These pharmacokinetic patterns exist in most stacks. Your
-                spreadsheet cannot detect them. Stochi scans for all of them in
-                real-time.
+                Example output from a pasted stack audit.
               </motion.p>
 
               <motion.div
@@ -1003,11 +999,11 @@ export function LandingPage() {
                 <motion.div variants={staggerItem}>
                   <RiskCard
                     type="danger"
-                    label="The Absorption Block"
-                    title="Zinc depleting Copper stores"
-                    description="High-dose Zinc (30mg+) without Copper causes gradual depletion. Symptoms appear after months: fatigue, anemia, neurological issues."
-                    detection="Zn:Cu ratio exceeds 15:1"
-                    recommendation="Add 2mg Copper per 30mg Zinc"
+                    label="Overlap"
+                    title="Magnesium appears in 2 products"
+                    description="The same ingredient appears across separate products in the same routine."
+                    detection="Redundant ingredient overlap"
+                    recommendation="Consolidate duplicate magnesium sources"
                     citation={CITATIONS.zincCopper}
                   />
                 </motion.div>
@@ -1015,11 +1011,11 @@ export function LandingPage() {
                 <motion.div variants={staggerItem}>
                   <RiskCard
                     type="danger"
-                    label="The Toxicity Threshold"
-                    title="Cumulative Upper Limit breach"
-                    description="Vitamin A and Selenium from multiple sources can silently reach the Upper Limit (UL). Liver toxicity and selenosis develop without warning."
-                    detection="Combined sources exceed UL"
-                    recommendation="Audit all Vitamin A / Selenium sources"
+                    label="Duplication"
+                    title="Zinc is duplicated across 2 products"
+                    description="Zinc appears in multiple products, increasing total daily intake without a clear reason."
+                    detection="Duplicate zinc sources"
+                    recommendation="Keep one zinc source or adjust dose"
                     citation={CITATIONS.vitaminD}
                   />
                 </motion.div>
@@ -1027,11 +1023,11 @@ export function LandingPage() {
                 <motion.div variants={staggerItem}>
                   <RiskCard
                     type="warning"
-                    label="The Half-Life Conflict"
-                    title="Fat-soluble vitamin without fat"
-                    description="Vitamin D, K, E, A require dietary fat for absorption. Taking on empty stomach reduces bioavailability by up to 50%."
-                    detection="D3/K2 logged without meal flag"
-                    recommendation="Take with fatty meal"
+                    label="Timing"
+                    title="Day/night timing conflict"
+                    description="Sedating ingredients are split across daytime and nighttime use in ways that complicate routine quality."
+                    detection="Sedating ingredients split across schedule"
+                    recommendation="Move sedating items to evening"
                     citation={CITATIONS.calciumIron}
                   />
                 </motion.div>
@@ -1039,11 +1035,11 @@ export function LandingPage() {
                 <motion.div variants={staggerItem}>
                   <RiskCard
                     type="danger"
-                    label="Pharmacodynamic Risk"
-                    title="Serotonergic compound stacking"
-                    description="Ashwagandha, 5-HTP, St. John's Wort enhance serotonin. Combined with SSRIs, risk of serotonin syndrome increases."
-                    detection="Multiple serotonergic agents"
-                    recommendation="Physician review required"
+                    label="Cleanup"
+                    title="Routine simplification available"
+                    description="The stack can be simplified without losing core intent by removing one duplicate and consolidating timing."
+                    detection="Stack can be reduced from 7 to 5 core items"
+                    recommendation="Remove one duplicate and shift 2 items to PM"
                     citation={CITATIONS.ashwagandha}
                   />
                 </motion.div>
@@ -1066,7 +1062,7 @@ export function LandingPage() {
                 id="case-study-heading"
                 className="mb-12 text-2xl font-semibold text-white/90 sm:text-3xl"
               >
-                Field report.
+                Expanded capability
               </h2>
 
               <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0A0A0A]">
@@ -1079,15 +1075,15 @@ export function LandingPage() {
                       </div>
                       <div>
                         <div className="text-sm font-medium text-white/90">
-                          Subject 492
+                          Stack history
                         </div>
                         <div className="text-xs text-white/50">
-                          The &quot;Optimized&quot; Stack
+                          Version tracking
                         </div>
                       </div>
                     </div>
                     <div className="rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400">
-                      3 Critical Errors
+                      3 actions available
                     </div>
                   </div>
                 </div>
@@ -1102,27 +1098,27 @@ export function LandingPage() {
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-white/50">Tracking method</span>
+                           <span className="text-white/50">Save stack versions</span>
                           <span className="text-white/90">
-                            Excel spreadsheet
+                             Yes
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-white/50">Duration</span>
+                           <span className="text-white/50">Re-audit after changes</span>
                           <span className="font-mono text-white/90 tabular-nums">
-                            4 years
+                             Yes
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-white/50">Daily compounds</span>
+                           <span className="text-white/50">Compare before/after</span>
                           <span className="font-mono text-white/90 tabular-nums">
-                            12+
+                             Yes
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-white/50">Self-assessment</span>
+                           <span className="text-white/50">Primary use case</span>
                           <span className="text-white/90">
-                            &quot;Plateaued, fatigued&quot;
+                             Supplement stack audit
                           </span>
                         </div>
                       </div>
@@ -1131,33 +1127,31 @@ export function LandingPage() {
                     {/* Findings */}
                     <div>
                       <div className="mb-3 text-xs font-medium tracking-wide text-red-400 uppercase">
-                        Stochi Findings
+                        Next actions
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-2">
                           <span className="font-medium text-red-400">
-                            CRITICAL:
+                            STEP:
                           </span>{" "}
                           <span className="text-white/80">
-                            <span className="font-mono">50mg</span> Zinc daily,{" "}
-                            <span className="font-mono">0mg</span> Copper
+                            Save current stack version
                           </span>
                         </div>
                         <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-2">
                           <span className="font-medium text-amber-400">
-                            WARNING:
+                            STEP:
                           </span>{" "}
                           <span className="text-white/80">
-                            D3 taken at <span className="font-mono">10pm</span>{" "}
-                            (no meal)
+                            Re-run audit after changes
                           </span>
                         </div>
                         <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-2">
                           <span className="font-medium text-amber-400">
-                            WARNING:
+                            STEP:
                           </span>{" "}
                           <span className="text-white/80">
-                            Ca + Mg + Zn simultaneous
+                            Compare before/after results
                           </span>
                         </div>
                       </div>
@@ -1170,15 +1164,8 @@ export function LandingPage() {
                       Outcome
                     </div>
                     <p className="text-base leading-relaxed text-white/60">
-                      &quot;I thought the fatigue was just aging. Stochi found
-                      the Zinc/Copper imbalance on day one. Added{" "}
-                      <span className="font-mono">5mg</span> Copper, split my
-                      mineral timing.{" "}
-                      <span className="font-medium text-emerald-400">
-                        Energy returned within 3 weeks.
-                      </span>{" "}
-                      Four years of spreadsheets missed what Stochi caught
-                      instantly.&quot;
+                      Keep the audit as the main wedge. Use versioning and
+                      re-audits to maintain a cleaner stack over time.
                     </p>
                   </div>
                 </div>
@@ -1201,19 +1188,18 @@ export function LandingPage() {
               id="cta-heading"
               className="text-2xl font-semibold text-white/90 sm:text-3xl"
             >
-              Stop guessing.
+              Run a quick audit before your stack gets harder to manage.
             </h2>
             <p className="mt-3 text-base text-white/50">
-              Your stack might be fine. Or it might be working against you. Only
-              a diagnostic will tell.
+              Paste your current routine and get a clear report you can act on.
             </p>
             <div className="mt-8">
               <Button
                 asChild
                 size="lg"
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 px-10 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-emerald-500/30"
+                className="bg-foreground px-10 text-sm font-semibold text-background shadow-lg shadow-black/25 transition-all duration-200 hover:bg-foreground/90 hover:shadow-xl hover:shadow-black/30"
               >
-                <Link href="/auth/sign-up">Run Your Stack Audit</Link>
+                  <Link href="/auth/sign-up">Audit My Stack</Link>
               </Button>
             </div>
           </div>
@@ -1307,7 +1293,9 @@ export function LandingPage() {
 
             {/* Bottom bar */}
             <div className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-white/30">
-              Not medical advice. Always consult a healthcare professional.
+              For informational purposes only. This tool does not provide
+              medical advice, diagnosis, or treatment. Consult a qualified
+              healthcare professional for medical decisions.
             </div>
           </div>
         </footer>
@@ -1502,7 +1490,7 @@ function ProtocolDemo() {
         aria-hidden="true"
         className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
           phase === "complete"
-            ? "bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/20"
+            ? "bg-foreground text-background shadow-lg shadow-black/25"
             : phase === "executing"
               ? "bg-emerald-500/20 text-emerald-400"
               : "border border-white/[0.08] bg-white/[0.03] text-white/80"
@@ -1722,7 +1710,7 @@ function TerminalAnalyzer({
           </div>
           <button
             onClick={analyze}
-            className="flex w-full shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 sm:w-auto"
+            className="flex w-full shrink-0 items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-sm font-medium text-background shadow-lg shadow-black/25 transition-colors hover:bg-foreground/90 sm:w-auto"
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
             Analyze

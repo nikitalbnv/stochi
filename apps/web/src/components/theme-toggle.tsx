@@ -1,9 +1,19 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "./ui/button";
+
+function useMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
 
 type ThemeToggleProps = {
   className?: string;
@@ -11,6 +21,12 @@ type ThemeToggleProps = {
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useMounted();
+
+  if (!mounted) {
+    return <Button type="button" variant="ghost" size="icon" className={className} />;
+  }
+
   const isDark = resolvedTheme !== "light";
 
   return (
