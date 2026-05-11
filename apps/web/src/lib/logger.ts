@@ -1,19 +1,82 @@
-/**
- * Development-only Logger Utility
- *
- * Logs messages only in development environment to avoid
- * leaking sensitive information in production.
- */
-
-const isDev = process.env.NODE_ENV === "development";
+import { env } from "~/env";
 
 type LogLevel = "debug" | "info" | "warn" | "error";
+
+const levelPriority: Record<LogLevel, number> = {
+  debug: 10,
+  info: 20,
+  warn: 30,
+  error: 40,
+};
+
+const isDev = env.NODE_ENV === "development";
+const configuredLevel = env.LOG_LEVEL ?? (isDev ? "debug" : "info");
+const logFormat = env.LOG_FORMAT ?? (isDev ? "pretty" : "json");
+const serviceName = env.SERVICE_NAME ?? "stochi-web";
+const lokiUrl = env.LOG_LOKI_URL;
+const lokiUsername = env.LOG_LOKI_USERNAME;
+const lokiToken = env.LOG_LOKI_TOKEN;
+const redactedValue = "[redacted]";
+const sensitiveKeyPattern = /authorization|cookie|password|secret|token|key/i;
 
 interface LogOptions {
   /** Optional context/module name for the log */
   context?: string;
   /** Additional data to log */
   data?: unknown;
+}
+
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  service: string;
+  environment: string;
+  message: string;
+  context?: string;
+  data?: unknown;
+}
+
+function shouldLog(level: LogLevel): boolean {
+  return levelPriority[level] >= levelPriority[configuredLevel];
+}
+
+function sanitizeData(value: unknown, key = "", depth = 0): unknown {
+  if (sensitiveKeyPattern.test(key)) return redactedValue;
+  if (value instanceof Error) {
+    return {
+      name: value.name,
+      message: value.message,
+      stack: isDev ? value.stack : undefined,
+    };
+  }
+  if (value === null || typeof value !== "object") return value;
+  if (depth >= 4) return "[truncated]";
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeData(item, key, depth + 1));
+  }
+
+  const sanitized: Record<string, unknown> = {};
+  for (const [entryKey, entryValue] of Object.entries(
+    value as Record<string, unknown>,
+  )) {
+    sanitized[entryKey] = sanitizeData(entryValue, entryKey, depth + 1);
+  }
+  return sanitized;
+}
+
+function createEntry(level: LogLevel, message: string, options?: LogOptions) {
+  const data =
+    options?.data === undefined ? undefined : sanitizeData(options.data);
+
+  return {
+    timestamp: new Date().toISOString(),
+    level,
+    service: serviceName,
+    environment: env.NODE_ENV,
+    message,
+    context: options?.context,
+    data,
+  } satisfies LogEntry;
 }
 
 function formatMessage(
@@ -26,52 +89,105 @@ function formatMessage(
   return `${timestamp} ${level.toUpperCase().padEnd(5)} ${context} ${message}`.trim();
 }
 
+function writeToConsole(entry: LogEntry): void {
+  const writer = console[entry.level];
+  if (logFormat === "json") {
+    writer(JSON.stringify(entry));
+    return;
+  }
+
+  writer(
+    formatMessage(entry.level, entry.message, { context: entry.context }),
+    entry.data ?? "",
+  );
+}
+
+async function pushToLoki(entry: LogEntry): Promise<void> {
+  if (!lokiUrl) return;
+
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (lokiUsername && lokiToken) {
+    headers.set(
+      "Authorization",
+      `Basic ${Buffer.from(`${lokiUsername}:${lokiToken}`).toString("base64")}`,
+    );
+  } else if (lokiToken) {
+    headers.set("Authorization", `Bearer ${lokiToken}`);
+  }
+
+  const labels: Record<string, string> = {
+    service: entry.service,
+    level: entry.level,
+    environment: entry.environment,
+  };
+  if (entry.context) labels.context = entry.context;
+
+  await fetch(lokiUrl, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      streams: [
+        {
+          stream: labels,
+          values: [
+            [`${BigInt(Date.now()) * 1_000_000n}`, JSON.stringify(entry)],
+          ],
+        },
+      ],
+    }),
+  });
+}
+
+function emit(level: LogLevel, message: string, options?: LogOptions): void {
+  if (!shouldLog(level)) return;
+
+  const entry = createEntry(level, message, options);
+  writeToConsole(entry);
+
+  if (lokiUrl) {
+    void pushToLoki(entry).catch((error: unknown) => {
+      if (isDev) {
+        console.warn(
+          formatMessage("warn", "Failed to push log to Loki", {
+            context: "logger",
+          }),
+          sanitizeData(error),
+        );
+      }
+    });
+  }
+}
+
 /**
- * Logger that only outputs in development environment
+ * Server-side logger for structured stdout and optional Loki push ingestion.
  */
 export const logger = {
   /**
    * Debug level - verbose information for debugging
    */
   debug(message: string, options?: LogOptions): void {
-    if (!isDev) return;
-    console.debug(
-      formatMessage("debug", message, options),
-      options?.data ?? "",
-    );
+    emit("debug", message, options);
   },
 
   /**
    * Info level - general information
    */
   info(message: string, options?: LogOptions): void {
-    if (!isDev) return;
-    console.info(formatMessage("info", message, options), options?.data ?? "");
+    emit("info", message, options);
   },
 
   /**
    * Warn level - warning messages
    */
   warn(message: string, options?: LogOptions): void {
-    if (!isDev) return;
-    console.warn(formatMessage("warn", message, options), options?.data ?? "");
+    emit("warn", message, options);
   },
 
   /**
-   * Error level - error messages (also logs in production for critical issues)
-   * Note: Be careful not to log sensitive data in error messages
+   * Error level - error messages. Data is redacted before it is emitted.
    */
   error(message: string, options?: LogOptions): void {
-    // Errors are logged in all environments, but without sensitive data
-    if (isDev) {
-      console.error(
-        formatMessage("error", message, options),
-        options?.data ?? "",
-      );
-    } else {
-      // In production, only log the message without potentially sensitive data
-      console.error(formatMessage("error", message));
-    }
+    emit("error", message, options);
   },
 
   /**

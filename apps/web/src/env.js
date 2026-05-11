@@ -25,6 +25,13 @@ export const env = createEnv({
     // Feature flags
     FEATURE_COACH_OVERLAY: z.enum(["true", "false"]).optional(),
     FEATURE_PROTOCOL_HEALTH_SCORE: z.enum(["true", "false"]).optional(),
+    // Observability
+    LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).optional(),
+    LOG_FORMAT: z.enum(["pretty", "json"]).optional(),
+    LOG_LOKI_URL: z.string().url().optional(),
+    LOG_LOKI_USERNAME: z.string().optional(),
+    LOG_LOKI_TOKEN: z.string().optional(),
+    SERVICE_NAME: z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -52,6 +59,12 @@ export const env = createEnv({
     GEMINI_MODEL: process.env.GEMINI_MODEL,
     FEATURE_COACH_OVERLAY: process.env.FEATURE_COACH_OVERLAY,
     FEATURE_PROTOCOL_HEALTH_SCORE: process.env.FEATURE_PROTOCOL_HEALTH_SCORE,
+    LOG_LEVEL: process.env.LOG_LEVEL,
+    LOG_FORMAT: process.env.LOG_FORMAT,
+    LOG_LOKI_URL: process.env.LOG_LOKI_URL,
+    LOG_LOKI_USERNAME: process.env.LOG_LOKI_USERNAME,
+    LOG_LOKI_TOKEN: process.env.LOG_LOKI_TOKEN,
+    SERVICE_NAME: process.env.SERVICE_NAME,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,

@@ -1,0 +1,66 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: stochi-grafana
+    depends_on:
+      - loki
+      - tempo
+      - mimir
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_DEFAULT_THEME: dark
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+  loki:
+    image: grafana/loki:latest
+    container_name: stochi-loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+      - ./loki/loki.yaml:/etc/loki/local-config.yaml:ro
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: stochi-promtail
+    depends_on:
+      - loki
+    command: -config.file=/etc/promtail/config.yaml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail/promtail.yaml:/etc/promtail/config.yaml:ro
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: stochi-tempo
+    command: -config.file=/etc/tempo/tempo.yaml
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - tempo-data:/var/tempo
+      - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+
+  mimir:
+    image: grafana/mimir:latest
+    container_name: stochi-mimir
+    command: -config.file=/etc/mimir/mimir.yaml
+    ports:
+      - "9009:9009"
+    volumes:
+      - mimir-data:/data/mimir
+      - ./mimir/mimir.yaml:/etc/mimir/mimir.yaml:ro
+
+volumes:
+  grafana-data:
+  loki-data:
+  tempo-data:
+  mimir-data:

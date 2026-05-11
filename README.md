@@ -105,6 +105,10 @@ GitHub Actions also runs the visible repo quality gate on pushes and pull reques
 - `apps/web`: `bun run check` and `bun test`
 - `apps/engine`: `go test ./...`
 
+## Observability
+
+Local LGTM observability lives in `infra/observability` and is documented in `docs/observability.md`.
+
 ## More docs
 
 - `docs/technical_design_doc.md`
