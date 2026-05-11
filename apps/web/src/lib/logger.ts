@@ -1,5 +1,3 @@
-import { env } from "~/env";
-
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 const levelPriority: Record<LogLevel, number> = {
@@ -9,13 +7,15 @@ const levelPriority: Record<LogLevel, number> = {
   error: 40,
 };
 
-const isDev = env.NODE_ENV === "development";
-const configuredLevel = env.LOG_LEVEL ?? (isDev ? "debug" : "info");
-const logFormat = env.LOG_FORMAT ?? (isDev ? "pretty" : "json");
-const serviceName = env.SERVICE_NAME ?? "stochi-web";
-const lokiUrl = env.LOG_LOKI_URL;
-const lokiUsername = env.LOG_LOKI_USERNAME;
-const lokiToken = env.LOG_LOKI_TOKEN;
+const nodeEnv = process.env.NODE_ENV ?? "development";
+const isDev = nodeEnv === "development";
+const configuredLevel =
+  parseLogLevel(process.env.LOG_LEVEL) ?? (isDev ? "debug" : "info");
+const logFormat = process.env.LOG_FORMAT === "json" ? "json" : "pretty";
+const serviceName = process.env.SERVICE_NAME ?? "stochi-web";
+const lokiUrl = process.env.LOG_LOKI_URL;
+const lokiUsername = process.env.LOG_LOKI_USERNAME;
+const lokiToken = process.env.LOG_LOKI_TOKEN;
 const redactedValue = "[redacted]";
 const sensitiveKeyPattern = /authorization|cookie|password|secret|token|key/i;
 
@@ -34,6 +34,19 @@ interface LogEntry {
   message: string;
   context?: string;
   data?: unknown;
+}
+
+function parseLogLevel(value: string | undefined): LogLevel | undefined {
+  if (
+    value === "debug" ||
+    value === "info" ||
+    value === "warn" ||
+    value === "error"
+  ) {
+    return value;
+  }
+
+  return undefined;
 }
 
 function shouldLog(level: LogLevel): boolean {
@@ -72,7 +85,7 @@ function createEntry(level: LogLevel, message: string, options?: LogOptions) {
     timestamp: new Date().toISOString(),
     level,
     service: serviceName,
-    environment: env.NODE_ENV,
+    environment: nodeEnv,
     message,
     context: options?.context,
     data,
